@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include "time.h"
 #include "utils/utils.h"
 
 int bellmanFord(int n, Edge* edges, int edgeCount, int src, int* distance) {
@@ -43,7 +44,9 @@ int main() {
      int src = 0;
      int* distance = (int*)malloc(V * sizeof(int));
 
+     clock_t start = clock();
      int result = bellmanFord(V, edges, E, src, distance);
+     clock_t end = clock();
 
      if (result == -1) {
           printf("Negative weight cycle detected.\n");
@@ -58,6 +61,9 @@ int main() {
                
           }
      }
+
+     double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
+     printf("BF serail execution time : %f \n", time_spent);
 
      free(edges);
      free(distance);
