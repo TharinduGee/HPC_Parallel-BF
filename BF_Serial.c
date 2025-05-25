@@ -1,10 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-
-typedef struct Edge {
-     int u, v, wt
-} Edge;
+#include "utils/utils.h"
 
 int bellmanFord(int n, Edge* edges, int edgeCount, int src, int* distance) {
      for (int i = 0; i < n; i++) {
@@ -14,9 +11,9 @@ int bellmanFord(int n, Edge* edges, int edgeCount, int src, int* distance) {
 
      for (int i = 0; i < n; i++) {
           for (int j = 0; j < edgeCount; j++) {
-               int u = edges[j].u;
-               int v = edges[j].v;
-               int wt = edges[j].wt;
+               int u = edges[j].src;
+               int v = edges[j].dest;
+               int wt = edges[j].weight;
                if (distance[u] != INT_MAX && distance[u] + wt < distance[v]) {
                     if (i == n - 1) {
                          return -1;
@@ -30,32 +27,39 @@ int bellmanFord(int n, Edge* edges, int edgeCount, int src, int* distance) {
 }
 
 int main() {
-    int n = 5; 
-    int edgeCount = 5; 
+     int V, E, min_wt, max_wt;
 
-    Edge* edges = (Edge*) malloc(edgeCount * sizeof(Edge));
+     printf("Enter No of Verteces : ");
+     scanf("%d", &V);
+     printf("Enter No of Edges : ");
+     scanf("%d", &E);
+     printf("Enter minimum weight : ");
+     scanf("%d", &min_wt);
+     printf("Enter maximum weight : ");
+     scanf("%d", &max_wt);
 
-    edges[0] = (Edge){1, 3, 2};
-    edges[1] = (Edge){4, 3, -1};
-    edges[2] = (Edge){2, 4, 1};
-    edges[3] = (Edge){1, 2, 1};
-    edges[4] = (Edge){0, 1, 5};
+     Edge* edges = generateEdges(V, E, min_wt, max_wt);
 
-    int src = 0;
-    int* distance = (int*)malloc(n * sizeof(int));
+     int src = 0;
+     int* distance = (int*)malloc(V * sizeof(int));
 
-    int result = bellmanFord(n, edges, edgeCount, src, distance);
+     int result = bellmanFord(V, edges, E, src, distance);
 
-    if (result == -1) {
-        printf("Negative weight cycle detected.\n");
-    } else {
-        for (int i = 1; i < n; i++) {
-            printf("Shortest distance from source node - %d to destination node - %d = %d\n",
-                   src, i, distance[i]);
-        }
-    }
+     if (result == -1) {
+          printf("Negative weight cycle detected.\n");
+     } else {
+          for (int i = 1; i < V; i++) {
+               if (distance[i] == INT_MAX) {
+                    printf("No connection from source node - %d to destination node - %d \n", src, i);
+               } else {
+                    printf("Shortest distance from source node - %d to destination node - %d = %d\n", 
+                         src, i, distance[i]);
+               }
+               
+          }
+     }
 
-    free(edges);
-    free(distance);
-    return 0;
+     free(edges);
+     free(distance);
+     return 0;
 }
