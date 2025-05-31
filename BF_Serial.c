@@ -63,7 +63,7 @@ int main() {
      }
 
      double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
-     printf("BF serail execution time : %f \n", time_spent);
+     printf("BF serial execution time : %f \n", time_spent);
 
      free(edges);
      free(distance);
