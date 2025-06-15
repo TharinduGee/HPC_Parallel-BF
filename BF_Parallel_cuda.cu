@@ -13,6 +13,19 @@ __global__ initialize(int n, int src, int* d_distance) {
      }
 }
 
+__global__ relax(Edge *edges, int *d_distance, int edgeCount, int* d_updated) {
+    int j = blockIdx.x * blockDim.x + threadIdx.x;
+    if (j < edgeCount) {
+        int u = edges[j].src;
+        int v = edges[j].dest;
+        int wt = edges[j].weight;
+        if (d_distance[u] != INT_MAX && d_distance[v] > d_distance[u] + wt) {
+            d_distance[v] = d_distance[u] + wt;
+            d_updated = 1;
+        }
+    }
+}
+
 int bellmanFord(int n, Edge* edges, int edgeCount, int src, int* distance) {
 
      int *d_distance;
@@ -22,23 +35,37 @@ int bellmanFord(int n, Edge* edges, int edgeCount, int src, int* distance) {
      // wait till initialization is completed
      cudaDeviceSynchronize();
 
-     int updated = 0;
+     int updated;
+     int* d_updated;
+     Edge* d_edges;
+     cudaMalloc(&d_updated, sizeof(int));
+     cudaMalloc(&d_edged, edgecount * sizeof(Edge));
+     cudaMemcpy(d_edges, edged, edgeCount * sizeof(Edge), cudaMemcpyHostToDevice);
 
      for (int i = 0; i < n; i++) {
-          for (int j = 0; j < edgeCount; j++) {
-               int u = edges[j].src;
-               int v = edges[j].dest;
-               int wt = edges[j].weight;
-               if (distance[u] != INT_MAX && distance[u] + wt < distance[v]) {
-                    if (i == n - 1) {
-                         return -1;
-                    }
-                    distance[v] = distance[u] + wt;
-                    updated = 1;
-               }
+          updated = 0;
+          cudaMemcpy(d_updated, updated, sizeof(int), cudaMemcpyHostToDevice);
+          relax<<<edgeCount - 1 + BLOCK_DIM, BLOCK_DIM>>>(d_edges, d_distance, edgeCount, d_updated);
+          cudaMemcpy(updated, d_updated, sizeof(int), cudaMemcpyDeviceToHost);
+          cudaDeviceSynchronize();
+
+          // detect negetive cycle
+          if (i == n - 1 && updated) {
+               cudaFree(d_edges);
+               cudaFree(d_distance);
+               cudaFree(d_updated);
+               return -1;
           }
-          if (!updated) break;
+          
+          // early stopping
+          if (!d_updated) break;
      }
+
+     cudaMemcpy(distance, d_distance, n * sizeof(int), cudaMemcpyDeviceToHost);
+
+     cudaFree(d_edges);
+     cudaFree(d_distance);
+     cudaFree(d_updated);
 
      return 0;
 }
