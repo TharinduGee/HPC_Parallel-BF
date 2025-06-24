@@ -9,6 +9,7 @@ int bellmanFord(int n, Edge* edges, int edgeCount, int src, int* distance) {
           distance[i] = INT_MAX;
      }
      distance[src] = 0;
+     int updated = 0;
 
      for (int i = 0; i < n; i++) {
           for (int j = 0; j < edgeCount; j++) {
@@ -20,8 +21,10 @@ int bellmanFord(int n, Edge* edges, int edgeCount, int src, int* distance) {
                          return -1;
                     }
                     distance[v] = distance[u] + wt;
+                    updated = 1;
                }
           }
+          if (!updated) break;
      }
 
      return 0;
