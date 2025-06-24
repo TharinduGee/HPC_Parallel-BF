@@ -18,10 +18,14 @@ __global__ void relax(Edge *edges, int *d_distance, int edgeCount, int* d_update
           int u = edges[j].src;
           int v = edges[j].dest;
           int wt = edges[j].weight;
-          if (d_distance[u] != INT_MAX && d_distance[v] > d_distance[u] + wt) {
-               // consider putting atomicMin here to ensure thread safety if needed
-               d_distance[v] = d_distance[u] + wt;
-               *d_updated = 1;
+          // check whether the vertice is reacheable
+          if (d_distance[u] != INT_MAX) {
+               int new_dist = d_distance[u] + wt;
+               // atomically update minimum across all threads but returns old distance
+               int curr_dist = atomicMin(&d_distance[v], new_dist);
+               if (new_dist < curr_dist) {
+                    *d_updated = 1; 
+               }
           }
      }
 }
