@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <omp.h>
-#include "utils/utils.h" 
+#include "utils/graphGeneratorUtils.h"
 
 #define BLOCK_DIM 256
 
@@ -152,14 +152,14 @@ int main() {
      int V, E, min_wt, max_wt;
      printf("Enter No of Vertices : "); 
      scanf("%d", &V);
-     printf("Enter No of Edges : "); 
-     scanf("%d", &E);
      printf("Enter minimum weight : "); 
      scanf("%d", &min_wt);
      printf("Enter maximum weight : "); 
      scanf("%d", &max_wt);
 
-     Edge* global_edges = generateEdges(V, E, min_wt, max_wt);
+     generateGraph(V, min_wt, max_wt);
+     Edge* global_edges = readGraphFromFile(V, min_wt, max_wt, &E);
+     
      int src = 0; 
      float cpu_gpu_ratio = 0.00;
      int* distance = (int*) malloc(V * sizeof(int));

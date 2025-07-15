@@ -2,7 +2,7 @@
 #include <omp.h>
 #include <stdlib.h>
 #include <limits.h>
-#include "utils/utils.h"
+#include "utils/graphGeneratorUtils.h"
 
 int bellmanFord(int n, Edge* edges, int edgeCount, int src, int* distance) {
 
@@ -44,14 +44,13 @@ int main() {
 
      printf("Enter No of Verteces : ");
      scanf("%d", &V);
-     printf("Enter No of Edges : ");
-     scanf("%d", &E);
      printf("Enter minimum weight : ");
      scanf("%d", &min_wt);
      printf("Enter maximum weight : ");
      scanf("%d", &max_wt);
 
-     Edge* edges = generateEdges(V, E, min_wt, max_wt);
+     generateGraph(V, min_wt, max_wt);
+     Edge* edges = readGraphFromFile(V, min_wt, max_wt, &E);
 
      int src = 0;
      int* distance = (int*)malloc(V * sizeof(int));
