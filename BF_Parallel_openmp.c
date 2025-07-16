@@ -59,10 +59,20 @@ int main() {
      int result = bellmanFord(V, edges, E, src, distance);
      double end = omp_get_wtime();
 
+     char filename[100];
+     snprintf(filename, sizeof(filename), "openmp_output__%d_%d_%d.txt", V, max_wt, min_wt);
+     FILE *fp = fopen(filename, "w");
+     if (!fp) {
+          perror("Failed to write output file");
+          return 1;
+     }
+
      if (result == -1) {
           printf("Negative weight cycle detected.\n");
+          fprintf(fp, "Negative weight cycle detected.\n");
      } else {
           for (int i = 1; i < V; i++) {
+               fprintf(fp, "%d\n", distance[i]);
                if (distance[i] == INT_MAX) {
                     printf("No connection from source node - %d to destination node - %d \n", src, i);
                } else {
@@ -75,6 +85,9 @@ int main() {
 
      double time_spent = (double)(end - start);
      printf("BF parallel openmp execution time : %f \n", time_spent);
+
+     fclose(fp);
+     printf("Output saved to file: %s\n", filename);
 
      free(edges);
      free(distance);

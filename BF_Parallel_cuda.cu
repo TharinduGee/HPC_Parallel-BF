@@ -101,10 +101,20 @@ int main() {
      float time_spent = 0;
      cudaEventElapsedTime(&time_spent, start, stop);
 
+     char filename[100];
+     snprintf(filename, sizeof(filename), "cuda_output__%d_%d_%d.txt", V, max_wt, min_wt);
+     FILE *fp = fopen(filename, "w");
+     if (!fp) {
+          perror("Failed to write output file");
+          return 1;
+     }
+
      if (result == -1) {
           printf("Negative weight cycle detected.\n");
+          fprintf(fp, "Negative weight cycle detected.\n");
      } else {
           for (int i = 1; i < V; i++) {
+               fprintf(fp, "%d\n", distance[i]);
                if (distance[i] == INT_MAX) {
                     printf("No connection from source node - %d to destination node - %d \n", src, i);
                } else {
@@ -116,6 +126,9 @@ int main() {
 
      printf("BF parallel cuda execution time : %f \n", time_spent / 1000.0f);
 
+     fclose(fp);
+     printf("Output saved to file: %s\n", filename);
+     
      free(edges);
      free(distance);
      return 0;

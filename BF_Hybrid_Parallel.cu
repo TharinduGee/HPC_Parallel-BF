@@ -159,7 +159,7 @@ int main() {
 
      generateGraph(V, min_wt, max_wt);
      Edge* global_edges = readGraphFromFile(V, min_wt, max_wt, &E);
-     
+
      int src = 0; 
      float cpu_gpu_ratio = 0.00;
      int* distance = (int*) malloc(V * sizeof(int));
@@ -180,10 +180,20 @@ int main() {
 
      double end_time = omp_get_wtime();
 
+     char filename[100];
+     snprintf(filename, sizeof(filename), "hybrid_output__%d_%d_%d.txt", V, max_wt, min_wt);
+     FILE *fp = fopen(filename, "w");
+     if (!fp) {
+          perror("Failed to write output file");
+          return 1;
+     }
+
      if (result == -1) {
           printf("Negative weight cycle detected.\n");
+          fprintf(fp, "Negative weight cycle detected.\n");
      } else {
           for (int i = 1; i < V; i++) {
+               fprintf(fp, "%d\n", distance[i]);
                if (distance[i] == INT_MAX) {
                     printf("No connection from source node - %d to destination node - %d \n", src, i);
                } else {
@@ -194,6 +204,9 @@ int main() {
      }
     
      printf("\nHybrid execution time: %f seconds\n", end_time - start_time);
+
+     fclose(fp);
+     printf("Output saved to file: %s\n", filename);
 
      free(global_edges);
      free(distance);
