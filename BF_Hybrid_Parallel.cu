@@ -164,7 +164,7 @@ int main() {
      float cpu_gpu_ratio = 0.00;
      int* distance = (int*) malloc(V * sizeof(int));
 
-     printf("Enter cpu to cpu ratio to share edge relaxation : ");
+     printf("Enter cpu to gpu ratio to share edge relaxation : ");
      scanf("%f", &cpu_gpu_ratio);
 
      Edge *cpu_edges, *gpu_edges;
