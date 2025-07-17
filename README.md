@@ -57,7 +57,7 @@ nvcc BF\_Parallel\_cuda.cu utils/\*.c \-I./utils \-o BF\_Parallel\_cuda.exe
 
 ### **🔹 Hybrid Version (CPU-GPU Collaboration)**
 
-nvcc BF\_Hybrid\_Parallel.cu utils/\*.c \-I./utils \-Xcompiler \-fopenmp \-o BF\_Hybrid\_Parallel.exe  
+nvcc BF\_Hybrid\_Parallel.cu utils/\*.c \-I./utils \-Xcompiler \-fopenmp \-o BF\_Hybrid\_Parallel.exe
 OMP_NUM_THREADS=4 ./BF\_Hybrid\_Parallel.exe
 
 ## **🧪 Graph Generation and Input**
@@ -83,6 +83,28 @@ If you set num\_vertices \= 100, max\_weight \= 30, and min\_weight \= \-30, the
 graph\_100\_30\_-30.txt
 
 This reusability is a key feature, as it guarantees that all four versions (Serial, OpenMP, CUDA, Hybrid) are tested on the exact same input graph, making performance comparisons valid.
+
+## 🔍 How to Compare Output Files (RMSE Evaluation)
+
+To evaluate the accuracy of hybrid or parallel executions against a reference implementation (e.g., serial version), you can compute the **Root Mean Square Error (RMSE)** between their distance outputs.
+
+### 📄 Output File Format
+
+Each run generates an output file named:
+type_output_<vertices><min_weight><max_weight>.txt
+
+**Example**: serial_output__5000_1_5.txt
+
+### ▶️ Usage ###
+
+python compare_rmse.py <reference_file.txt> <test_file.txt>
+
+**Example**: 
+python compare_rmse.py serial_output__5000_1_5.txt hybrid_output__5000_1_5.txt
+
+**Output**:
+RMSE between 'serial_output__5000_1_5.txt' and 'hybrid_output__5000_1_5.txt': 0.000000
+
 
 ## **📊 Features**
 
